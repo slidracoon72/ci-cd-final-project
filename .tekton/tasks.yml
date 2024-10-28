@@ -34,7 +34,6 @@ spec:
         fi
 
 ---
-
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
