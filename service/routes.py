@@ -1,6 +1,7 @@
 """
 Controller for routes
 """
+
 from flask import jsonify, url_for, abort
 from service import app
 from service.common import status
@@ -8,18 +9,12 @@ from service.common import status
 COUNTER = {}
 
 
-############################################################
-# Health Endpoint
-############################################################
 @app.route("/health")
 def health():
     """Health Status"""
     return jsonify(dict(status="OK")), status.HTTP_200_OK
 
 
-############################################################
-# Index page
-############################################################
 @app.route("/")
 def index():
     """Returns information abut the service"""
@@ -32,29 +27,27 @@ def index():
     )
 
 
-############################################################
-# List counters
-############################################################
 @app.route("/counters", methods=["GET"])
 def list_counters():
     """Lists all counters"""
     app.logger.info("Request to list all counters...")
 
-    counters = [dict(name=count[0], counter=count[1]) for count in COUNTER.items()]
+    counters = [
+        dict(name=count[0], counter=count[1]) for count in COUNTER.items()
+    ]
 
     return jsonify(counters)
 
 
-############################################################
-# Create counters
-############################################################
 @app.route("/counters/<name>", methods=["POST"])
 def create_counters(name):
     """Creates a new counter"""
     app.logger.info("Request to Create counter: %s...", name)
 
     if name in COUNTER:
-        return abort(status.HTTP_409_CONFLICT, f"Counter {name} already exists")
+        return abort(
+            status.HTTP_409_CONFLICT, f"Counter {name} already exists"
+        )
 
     COUNTER[name] = 0
 
@@ -66,31 +59,29 @@ def create_counters(name):
     )
 
 
-############################################################
-# Read counters
-############################################################
 @app.route("/counters/<name>", methods=["GET"])
 def read_counters(name):
     """Reads a single counter"""
     app.logger.info("Request to Read counter: %s...", name)
 
     if name not in COUNTER:
-        return abort(status.HTTP_404_NOT_FOUND, f"Counter {name} does not exist")
+        return abort(
+            status.HTTP_404_NOT_FOUND, f"Counter {name} does not exist"
+        )
 
     counter = COUNTER[name]
     return jsonify(name=name, counter=counter)
 
 
-############################################################
-# Update counters
-############################################################
 @app.route("/counters/<name>", methods=["PUT"])
 def update_counters(name):
     """Updates a counter"""
     app.logger.info("Request to Update counter: %s...", name)
 
     if name not in COUNTER:
-        return abort(status.HTTP_404_NOT_FOUND, f"Counter {name} does not exist")
+        return abort(
+            status.HTTP_404_NOT_FOUND, f"Counter {name} does not exist"
+        )
 
     COUNTER[name] += 1
 
@@ -98,9 +89,6 @@ def update_counters(name):
     return jsonify(name=name, counter=counter)
 
 
-############################################################
-# Delete counters
-############################################################
 @app.route("/counters/<name>", methods=["DELETE"])
 def delete_counters(name):
     """Deletes a counter"""
@@ -112,9 +100,6 @@ def delete_counters(name):
     return "", status.HTTP_204_NO_CONTENT
 
 
-############################################################
-# Utility for testing
-############################################################
 def reset_counters():
     """Removes all counters while testing"""
     global COUNTER  # pylint: disable=global-statement
